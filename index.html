@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SketchLink: Premium Art Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap');
+
+        :root {
+            --bg-dark: #121418;
+            --text-light: #f4f5f7;
+            --text-muted: #9ba0aa;
+            --accent-gold: #d4af37;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-border-hover: rgba(212, 175, 55, 0.6);
+            --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1e2128 0%, transparent 70%);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2.5rem 6%;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--accent-gold);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .btn-login {
+            background: transparent;
+            color: var(--text-light);
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .btn-login:hover {
+            color: var(--accent-gold);
+        }
+
+        .btn-explore {
+            background: transparent;
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-explore:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 6rem 2rem 5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            max-width: 900px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            max-width: 650px;
+            line-height: 1.6;
+        }
+
+        .gallery {
+            padding: 2rem 6% 8rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            z-index: 10;
+            perspective: 1200px;
+        }
+
+        @media (max-width: 1024px) {
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 3.2rem;
+            }
+
+            .header-actions {
+                gap: 1rem;
+            }
+
+            .btn-explore {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Glassmorphism Card Design */
+        .card-container {
+            position: relative;
+            transform-style: preserve-3d;
+            height: 320px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            will-change: transform, border-color, box-shadow;
+            transform-style: preserve-3d;
+            /* Base transition for resting state */
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Ambient glow for the gallery to ground it */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Placeholder theme bar */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--theme-color, #ffffff);
+            z-index: 2;
+            transition: height 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .card-content {
+            margin-top: auto;
+            transform: translateZ(40px);
+            /* Lifts the text 3D */
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .card-content h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            letter-spacing: -0.5px;
+        }
+
+        .card-content p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* Hover States for classes added by JS */
+        .card.is-hovered {
+            border-color: var(--card-border-hover);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .card.is-hovered::before {
+            height: 8px;
+        }
+
+        /* 1. Hide the default cursor */
+        body {
+            cursor: none;
+        }
+
+        /* 2. Create the Custom Cursor */
+        #custom-cursor {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+        }
+
+        #cursor-halo {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--accent-gold);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Creative Random Patches */
+        .bg-visuals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            filter: blur(60px);
+            /* Creates the soft "vibe" */
+            opacity: 0.4;
+        }
+
+        .patch {
+            position: absolute;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            /* Makes it organic, not a circle */
+            animation: morph 15s infinite alternate;
+        }
+
+        .patch-1 {
+            width: 400px;
+            height: 350px;
+            background: #d4af37;
+            top: 10%;
+            left: 5%;
+        }
+
+        .patch-2 {
+            width: 300px;
+            height: 300px;
+            background: #5D9BFF;
+            top: 60%;
+            left: 60%;
+        }
+
+        .patch-3 {
+            width: 250px;
+            height: 250px;
+            background: #FF5D5D;
+            top: 30%;
+            left: 40%;
+        }
+
+        @keyframes morph {
+            0% {
+                border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%;
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            100% {
+                border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+                transform: translate(50px, 50px) rotate(15deg);
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 3rem;
+            border-radius: 30px;
+            width: 400px;
+            text-align: center;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .modal-overlay.active .login-card {
+            transform: translateY(0);
+        }
+
+        .login-card h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .login-card p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent-gold);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .profile-container {
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            background: rgba(20, 22, 26, 0.95);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--card-border);
+            border-radius: 40px;
+            padding: 4rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 2rem;
+        }
+
+        .profile-info h2 {
+            font-size: 3rem;
+            color: var(--accent-gold);
+        }
+
+        .artist-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .sketch-slot {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            background-size: cover;
+            background-position: center;
+            transition: 0.3s;
+        }
+
+        .sketch-slot:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-gold);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="custom-cursor"></div>
+    <div id="cursor-halo"></div>
+    <div class="bg-visuals">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+    <header>
+        <a href="#" class="logo">Sketch<span>Link</span></a>
+        <div class="header-actions">
+            <a href="login.html" class="btn-login" style="text-decoration: none; display: flex; align-items: center;">LOG IN</a>
+            <button class="btn-explore">EXPLORE COLLECTIONS</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Discover Exceptional Digital Art</h1>
+            <p>A curated marketplace exclusively for premium digital artwork, connecting visionary artists with
+                discerning collectors.</p>
+        </section>
+        <section class="artist-upload">
+            <div class="upload-box">
+                <h3>Artist Studio</h3>
+                <p>Upload a new sketch from your device</p>
+                <input type="file" id="sketch-upload" accept="image/*" style="display: none;">
+                <button class="btn-explore" onclick="document.getElementById('sketch-upload').click()">
+                    SELECT IMAGE
+                </button>
+            </div>
+        </section>
+        <section class="gallery">
+            <div class="card-container">
+                <div class="card" style="--theme-color: #FF5D5D;">
+                    <div class="card-content">
+                        <h3>Abstract Horizons</h3>
+                        <p>Helena Ross</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card" style="--theme-color: #5DFF8A;">
+                    <div class="card-content">
+                        <h3>Neon Reverie</h3>
+                        <p>Marco V</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card" style="--theme-color: #5D9BFF;">
+                    <div class="card-content">
+                        <h3>Echoes of Time</h3>
+                        <p>Galleria Modern</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card" style="--theme-color: #D65DFF;">
+                    <div class="card-content">
+                        <h3>Silent Monoliths</h3>
+                        <p>K. Chen</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card" style="--theme-color: #FFB85D;">
+                    <div class="card-content">
+                        <h3>Urban Decay</h3>
+                        <p>Studio 42</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card" style="--theme-color: #5DFFF5;">
+                    <div class="card-content">
+                        <h3>Synthetic Dreams</h3>
+                        <p>Sarah J.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <div id="login-modal" class="modal-overlay">
+        <div class="login-card">
+            <button class="close-btn">&times;</button>
+            <h2>Welcome Back</h2>
+            <p>Enter your credentials to access your collection.</p>
+            <form id="login-form">
+                <div class="input-group">
+                    <input type="email" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn-submit">SIGN IN</button>
+            </form>
+            <div class="login-footer">
+                <p>New Artist? <a href="#">Apply for Gallery</a></p>
+            </div>
+        </div>
+    </div>
+    <div id="profile-overlay" class="modal-overlay">
+        <div class="profile-container">
+            <button class="close-btn" id="close-profile">&times;</button>
+
+            <div class="profile-header">
+                <div class="profile-info">
+                    <h2 id="profile-name">Artist Name</h2>
+                    <p id="profile-bio">Master of Digital Abstract and Modernism.</p>
+                </div>
+                <div class="profile-actions">
+                    <input type="file" id="sketch-upload" accept="image/*" style="display: none;">
+                    <button class="btn-explore" onclick="document.getElementById('sketch-upload').click()">+ UPLOAD NEW
+                        SKETCH</button>
+                </div>
+            </div>
+
+            <div class="artist-gallery" id="artist-sketches">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="firebase-init.js"></script>
+
+    <script>
+
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = auth.currentUser;
+            const loginBtn = document.querySelector('.btn-login');
+            if (user) {
+                if (loginBtn) { loginBtn.textContent = user.displayName || user.email.split('@')[0]; loginBtn.href = 'website3.html'; }
+            }
+            // ... keep cursor, magnetic cards, profile opener, upload logic unchanged ...
+        });
+    </script>
+</body>
+
+</html>

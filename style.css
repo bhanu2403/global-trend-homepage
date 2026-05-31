@@ -1,0 +1,65 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+header {
+  background: #2E8B57;
+  color: white;
+  text-align: center;
+  padding: 2rem;
+}
+
+section {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: auto;
+}
+
+h2 {
+  color: #2E8B57;
+  margin-bottom: 1rem;
+}
+
+.project {
+  margin-bottom: 2rem;
+}
+
+.project img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+}
+
+#cta {
+  background: #f4f4f4;
+  text-align: center;
+}
+
+button {
+  background: #2E8B57;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  margin: 0.5rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #246b45;
+}
+
+footer {
+  background: #333;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+}
